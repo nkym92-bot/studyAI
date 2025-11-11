@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>studyAI - ITIL4 練習・模擬テスト</title>
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --text: #f5f5f5;
+      --card: #1b1b1b;
+      --accent: #00bcd4;
+      --error: #ff5252;
+      --input-bg: #111;
+      --choice-bg: #151515;
+      --choice-hover: #1f1f1f;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+    }
+
+    header {
+      text-align: center;
+      background: var(--card);
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+
+    h1 { color: var(--accent); margin: 0; }
+
+    main {
+      max-width: 820px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+
+    .setting-section {
+      background: var(--card);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    label { display: block; margin-top: 0.6rem; }
+
+    input, select, button {
+      width: 100%;
+      padding: 0.6rem;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      margin-top: 0.3rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .actions button {
+      flex: 1;
+    }
+
+    .question-card {
+      background: var(--card);
+      padding: 1.2rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .choices {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .choice {
+      background: var(--choice-bg);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .choice:hover {
+      background: var(--choice-hover);
+      border-color: var(--accent);
+    }
+
+    .choice.selected {
+      background: rgba(0,188,212,0.15);
+      border: 2px solid var(--accent);
+    }
+
+    /* ✨ 正解アニメーション */
+    @keyframes correctPulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,188,212,0.8); }
+      70% { box-shadow: 0 0 20px 10px rgba(0,188,212,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,188,212,0); }
+    }
+
+    .choice.correct {
+      background: rgba(0,188,212,0.25);
+      animation: correctPulse 0.7s ease-out;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .explanation, .ai-explain {
+      margin-top: 0.8rem;
+      padding: 0.6rem;
+      border-left: 3px solid var(--accent);
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+    }
+
+    .tag {
+      background: var(--accent);
+      color: white;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+    }
+
+    #progress {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    #domainChart {
+      margin-top: 1rem;
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      height: 120px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 5px;
+      padding: 6px;
+    }
+
+    .domain-bar {
+      flex: 1;
+      background: var(--accent);
+      border-radius: 3px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #fff;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #aaa;
+      padding: 1rem;
+    }
+
+    details summary {
+      cursor: pointer;
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .button-row, .actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header><h1>🤖 studyAI ITIL4 練習・模擬テスト</h1></header>
+  <main>
+    <div class="setting-section">
+      <label>🔑 OpenAI APIキー
+        <input id="apiKeyInput" type="password" placeholder="sk-..." />
+      </label>
+<label>🎯 モード
+  <select id="mode">
+    <option value="practice">練習モード（ヒント付き）</option>
+    <option value="exam">模擬モード（AI評価）</option>
+    <option value="generate">AI出題モード（AIが新問題と解説を自動生成）</option>
+  </select>
+</label>
+
+      <label>📚 分野
+        <select id="domain">
+          <option value="all">全分野</option>
+          <option value="SVS">SVS</option>
+          <option value="Practices">プラクティス</option>
+          <option value="SVC">バリューチェーン</option>
+          <option value="GuidingPrinciples">指針(GP)</option>
+        </select>
+      </label>
+      <label>🎯 出題範囲フィルタ（タグ・キーワード）
+        <input id="filterKeyword" type="text" placeholder="例：変更, 継続的改善, イベント管理" />
+      </label>
+      <label>🧮 出題数
+        <input id="count" type="number" min="5" max="80" value="10" />
+      </label>
+      <label>⏱ 制限時間（分）
+        <input id="minutes" type="number" min="5" max="90" value="30" />
+      </label>
+      <div class="actions">
+        <button id="startBtn">▶ 開始</button>
+        <button id="resetBtn" onclick="location.reload()">🔄 リセット</button>
+      </div>
+    </div>
+
+    <div id="quizArea"></div>
+    <div id="progress"><div id="bar"></div></div>
+  </main>
+
+  <footer>
+    <details>
+      <summary>💰 利用料金について</summary>
+      <p>AIヒントや評価1回あたり約0.02円。月1000回でも約20円程度。</p>
+    </details>
+    <p>🧠 Powered by GPT-4o mini | studyAI © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
